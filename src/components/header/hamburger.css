@@ -1,0 +1,17 @@
+.hexagon {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    width: 60px;
+    height: 60px;
+}
+
+.burger .burger-lines,
+.burger .burger-lines:after,
+.burger .burger-lines:before { background-color: white; }
+
+.burger {
+    font-size: 8px;
+}
+

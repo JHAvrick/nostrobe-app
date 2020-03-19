@@ -1,0 +1,17 @@
+.card-grid {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding: 0 0 1.25rem 0;
+}
+
+.card-grid .card {
+    margin: 1.25rem;
+}
+
+@media (max-width: 1200px){
+    .card-grid {
+        justify-content: center;
+    } 
+}
