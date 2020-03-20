@@ -14,6 +14,7 @@ import {
 import { SidebarState, useSidebarState } from './state/sidebar-state';
 import { elastic as Menu } from 'react-burger-menu';
 import Header from './components/header/header';
+import Footer from './components/footer/footer';
 import DesignsPage from './pages/designs/designs';
 import AboutPage from './pages/about/about';
 import ContactPage from './pages/contact/contact';
@@ -67,6 +68,7 @@ function App() {
             </Route>
           </Switch>
 
+          <Footer />
         </div>
       </Router>
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ReactImageFallback from 'react-image-fallback';
 import StoreIcons from '../../config/store-icons';
 import FallbackPNG from '../../assets/fallback.png';
-import Loader from 'react-loaders'
+import Loader from 'react-loaders';
 import { AiOutlineShopping } from 'react-icons/ai';
 import 'loaders.css';
 import './card.css';
@@ -14,6 +14,7 @@ const Availability = {
     'not_available': { label: "Not Available", color: "#FF9696" },
     'out_of_stock': { label: "out_of_stock", color: "#FF9696" },
     'out_of_print': { label: "out_of_print", color: "#FF9696" },
+    'coming_soon': { label: "Upcoming", color: "#969AFF" },
 }
 
 function Card(props) {
@@ -23,11 +24,13 @@ function Card(props) {
 
   const [isVisible, setIsVisible] = useState(false);
   useEffect(() => {
-    setTimeout(() => setIsVisible(true), 25);
+    let timeout = setTimeout(() => setIsVisible(true), 25);
+    return (() => clearTimeout(timeout))
   }, []);
 
+  const [stock, setStock] = useState(Availability[props.availability]);
+  useEffect(() => setStock(Availability[props.availability]),[props.availability]);
 
-  let stock = Availability[props.availability];
   return (
     <div className={isVisible ? "card" : "card--beforeenter"}>
         
@@ -81,8 +84,8 @@ Card.defaultProps = {
     defaultLink: "",
     images: [],
     title: "Untitled",
-    tags: [],
     availability: "available",
+    tags: [],
     stores: []
 }
 

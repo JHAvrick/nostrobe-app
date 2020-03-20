@@ -3,24 +3,30 @@ import { Card, CardGrid } from '../../components/card/card';
 import { Categories, Category } from '../../components/categories/categories';
 import { useParams } from "react-router-dom";
 import API_URL from '../../api-url';
+import './designs.css';
 
+import Loader from 'react-loaders'
 
 function useCategoryList(){
     const [categoryList, setCategoryList] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        console.log("Fetching Categories");
 
-        fetch(API_URL + '/design-categories')
+        setIsLoading(true);
+
+        fetch(API_URL + '/design-category-list')
         .then(response => response.json())
         .then(data => {
-            setCategoryList(
-                data.map((categoryObject) => categoryObject.category).sort()
-            );
-        }).catch(err => console.log(err));
+            setIsLoading(false);
+            setCategoryList(data.design_categories.sort());
+        }).catch((err) => {          
+            console.log(err);
+        });
+
       }, []);
 
-    return categoryList;
+    return [categoryList, isLoading];
 }
 
 /**
@@ -29,66 +35,86 @@ function useCategoryList(){
  */
 function useDesignsInCategory(category){
     const [designList, setDesignList] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [fetchError, setFetchError] = useState(false);
 
     useEffect(() => {
-        console.log("Fetching Designs: " + category);
+        setIsLoading(true);
 
         fetch(API_URL + '/design-categories?category=' + category)
         .then(response => response.json())
         .then(data => {
+
+            setFetchError(false);
+            setIsLoading(false);
             setDesignList(data[0].designs);
-        }).catch(err => console.log(err));
+
+        }).catch(err => {
+
+            console.warn(err);
+            setFetchError(true);
+
+        });
       }, [category]);
 
-    return designList;
+    return [designList, isLoading, fetchError];
 }
-
-
 
 function DesignsPage(props) {
     //let { category } = useParams();
-
-
-
-
     const [selectedCategory, setSelectedCategory] = useState(/* category || */  "all");
-    const handleCategorySelected = (category) => setSelectedCategory(category);
+    const handleCategorySelected = (category) => {
+        if (category !== selectedCategory){
+            setSelectedCategory(category); 
+        }
+    }
 
-    const categories = useCategoryList();
-    const designs = useDesignsInCategory(selectedCategory);
+    const [categories, categoriesLoading] = useCategoryList();
+    const [designs, designsLoading, fetchError] = useDesignsInCategory(selectedCategory);
 
-    console.log(categories);
-    console.log(designs);
+    const CategoryBar = categoriesLoading ? "" : (
+        <Categories onSelected={handleCategorySelected} selected={selectedCategory}>
+            {categories.map((categoryName, index) => <Category key={index} name={categoryName} /> )}
+        </Categories>
+    )
 
-    // defaultLink: "",
-    // img: "",
-    // title: "Untitled",
-    // tags: [],
-    // available: true,
-    // availibilityStatus: "In Stock",
-    // stores: []
+    const Loading = (
+        <div className="designs__loading">
+            {
+                fetchError ? <p style={{ fontSize: "1.5rem", textAlign: "center" }}> Could not fetch designs. <br/> Very uncool. </p> :
+                <Loader color="black" active={true} type="cube-transition" />
+            }
+        </div>
+    )
+
+    const Cards = (
+        <CardGrid>
+            {designs.map((design, index) => 
+                <Card 
+                    key={index}
+                    title={design.title}
+                    tags={design.tags}
+                    stores={design.stores}
+                    availability={design.availability}
+                    defaultLink={design.default_link}
+                    images={design.images.map((imageConfig) => {
+                        return API_URL + imageConfig.url;
+                    })}
+                />
+            )}
+        </CardGrid>
+    )
+
+    /**
+     * We don't mount our grid until our request is complete and our effect has 
+     * set isLoading to false.
+     */
+    const Grid =  (categoriesLoading || designsLoading) ? Loading : Cards;
 
     return (
         <div className="designs">
-            <Categories onSelected={handleCategorySelected} selected={selectedCategory}>
-                {categories.map((categoryName, index) => <Category key={index} name={categoryName} /> )}
-            </Categories>
-            <CardGrid>
-                {designs.map((design, index) => 
-                    <Card 
-                        key={Math.random()}
-                        title={design.title}
-                        tags={design.tags}
-                        stores={design.stores}
-                        availability={design.availiblility}
-                        defaultLink={design.default_link}
-                        images={design.images.map((imageConfig) => {
-                             return API_URL + imageConfig.url;
-                        })}
-                    />
-                
-                )}
-            </CardGrid>
+            {CategoryBar}
+            {Grid}
         </div>
     );
 }
