@@ -24,7 +24,7 @@ function Card(props) {
 
   const [isVisible, setIsVisible] = useState(false);
   useEffect(() => {
-    let timeout = setTimeout(() => setIsVisible(true), 25);
+    let timeout = setTimeout(() => setIsVisible(true), 15);
     return (() => clearTimeout(timeout))
   }, []);
 
