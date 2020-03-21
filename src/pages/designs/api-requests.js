@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import EventEmitter from '../../util/event-emitter';
-import API_URL from '../../api-url';
+import client from '../../contentful-client';
 
 const LoadStates = {
     "COMPLETE": "COMPLETE",
@@ -9,12 +9,12 @@ const LoadStates = {
 }
 
 const APIRequests = {
-    _categories: [],
-    _category: null,
-    _page: 0,
-    _pageSize: 9,
     _fetching: false, 
-    state: LoadStates.COMPLETE,
+    categories: [],
+    category: null,
+    page: 0,
+    pageSize: 9,
+    state: LoadStates.LOADING,
     designs: [],
     events: new EventEmitter(),
 
@@ -25,9 +25,9 @@ const APIRequests = {
 
     reset: function(){
         this._fetching = false;
-        //this._category = null;
-        //this.events.emit("categoryChanged", this._category);
-        this._page = 0;
+        //this.category = null;
+        //this.events.emit("categoryChanged", this.category);
+        this.page = 0;
         this.designs = [];
         this.state = LoadStates.COMPLETE;
     },
@@ -39,13 +39,13 @@ const APIRequests = {
      * @param {string} category
      */
     setCategory: function(category){
-        // if (/* category === this._category  || */ !this._categories.includes(category)) return;
+        // if (/* category === this.category  || */ !this.categories.includes(category)) return;
 
-        this._category = category;
+        this.category = category;
         this.designs = [];
-        this._page = 0;
+        this.page = 0;
 
-        this.events.emit("categoryChanged", this._category);
+        this.events.emit("categoryChanged", this.category);
         this.nextPage();
     },
 
@@ -59,9 +59,9 @@ const APIRequests = {
          * If we've already got categories we can skip the actual fetch and just trigger
          * our event and set our initial category
          */
-        if (this._categories.length > 0)  {
-            //this.events.emit("categoriesFetched", this._categories);
-            this.setCategory(this._category);
+        if (this.categories.length > 0)  {
+            //this.events.emit("categoriesFetched", this.categories);
+            this.setCategory(this.category);
             return;
         }
 
@@ -69,20 +69,20 @@ const APIRequests = {
         this._fetching = true;
 
         this._setLoadState(LoadStates.LOADING);
-        fetch(API_URL + '/design-category-list')
-        .then(response => response.json())
-        .then(data => {
+        client.getEntries({ 
+          content_type: 'designCategory'
+        }).then((entry) => {
             this._fetching = false;
-            this._categories = data.design_categories.sort();
-            this.events.emit("categoriesFetched", this._categories);
+            this.categories = entry.items.map((item) => item.fields.category);
+            this.events.emit("categoriesFetched", this.categories);
             this._setLoadState(LoadStates.COMPLETE);
-
-            this.setCategory(this._categories[0]);
-
-        }).catch((err) => {      
+            this.setCategory(this.categories[0]);
+        }
+        ).catch((err) => {
             this._fetching = false;    
             this._setLoadState(LoadStates.ERROR);
         });
+
     },
 
     /**
@@ -93,28 +93,47 @@ const APIRequests = {
         if (this._fetching) return;
         this._fetching = true;
 
-        let pageStart = this._page * this._pageSize;
-        let pageEnd = (this._page + 1) * this._pageSize;
-        let req = API_URL + `/designs?_start=${pageStart}&_limit=${pageEnd}&categories_in=${this._category}`;
-
-        console.log(req);
+        let pageStart = this.page * this.pageSize;
+        let pageEnd = (this.page + 1) * this.pageSize;
+        //let req = API_URL + `/designs?_start=${pageStart}&_limit=${pageEnd}&categories_in=${this.category}`;
 
         this._setLoadState(LoadStates.LOADING);
-        fetch(req)
-        .then(response => response.json())
-        .then(data => {
+        client.getEntries({ 
+            skip: pageStart,
+            limit: pageEnd,
+            content_type: 'design',
+            'fields.categories[in]': this.category,
+        }).then((entry) => {
+
             this._fetching = false;
-            this._page = this._page + 1;
-            this.designs = this.designs.concat(data);
-            this.events.emit("pageFetched", this.designs, this._page);
+            this.page = this.page + 1;
+
+            let nextPage = entry.items.map((item) => {
+                return {
+                    defaultLink: item.fields.defaultLink,
+                    title: item.fields.title,
+                    images: item.fields.images.map((image) => image.fields.file.url),
+                    availability: item.fields.availability[0],
+                    tags: item.fields.tags,
+                    stores: item.fields.stores
+                }
+            });
+
+            console.log(nextPage);
+
+            this.designs = this.designs.concat(nextPage);
+            this.events.emit("pageFetched", this.designs, this.page);
             this._setLoadState(LoadStates.COMPLETE);
-        }).catch(err => {
-            this._fetching = false;
+
+        }).catch((err) => {
+
+            console.log(err);
+
+            this._fetching = false;    
             this._setLoadState(LoadStates.ERROR);
         });
 
     }
-
 
 }
 
@@ -132,7 +151,7 @@ function useLoadState(){
 }
 
 function useCategories(){
-    const [categories, setCategories] = useState(APIRequests._categories);
+    const [categories, setCategories] = useState(APIRequests.categories);
 
     const handleCategoriesFetched = (newCategories) => setCategories([].concat(newCategories));
     useEffect(() => {
@@ -146,7 +165,7 @@ function useCategories(){
 }
 
 function useCurrentCategory(){
-    const [category, setCategory] = useState(APIRequests._category);
+    const [category, setCategory] = useState(APIRequests.category);
 
     const handleCategoryChanged = (newCategory) => setCategory(newCategory);
     useEffect(() => {

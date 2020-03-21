@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react';
 import './categories.css';
-import { Link } from "react-router-dom";
 
 function Categories(props) {
 

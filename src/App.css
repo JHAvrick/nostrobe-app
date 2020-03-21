@@ -11,11 +11,13 @@
 .contentwrapper {
   max-width: 1200px;
   margin: auto;
+  padding: 0 1.5rem;
 }
 
 h1, h2, p {
   text-align: left;
 }
+
 
 @media (min-width: 425px){
   html, body {

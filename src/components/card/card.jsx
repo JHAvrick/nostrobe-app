@@ -40,7 +40,7 @@ function Card(props) {
             )}
         </div>
 
-        <a target="_blank" href={props.defaultLink} className="card__a">
+        <a target="_blank" rel="noopener noreferrer" href={props.defaultLink} className="card__a">
             <LoadingImage isVisible={!isImageResolved} />
 
             <ReactImageFallback
@@ -93,6 +93,7 @@ function CardGrid(props) {
     return (
       <div className="card-grid">
           {props.children}
+          {props.children.length % 3 !== 0 ? <div className="dummy-card"></div> : "" }
       </div>
     );
 }
@@ -104,7 +105,7 @@ function StoreIcon(props){
                 <div className="card__store-icon-content">
                     <img className="card__store-img" alt="Store Icon" src={StoreIcons[props.storeName] || ""} />
                     <span className="card__store-label"> 
-                        <a target="_blank" href={props.storeLink}> { props.storeName } </a> 
+                        <a target="_blank" rel="noopener noreferrer" href={props.storeLink}> { props.storeName } </a> 
                     </span> 
                 </div>
             </div>

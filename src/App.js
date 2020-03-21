@@ -1,8 +1,9 @@
-import React, {useState} from 'react';
+import React from 'react';
 import 'normalize.css';
 import './sidebar.css';
 import './App.css';
 
+import Helmet from 'react-helmet';
 import {
   BrowserRouter as Router,
   Switch,
@@ -16,14 +17,20 @@ import { elastic as Menu } from 'react-burger-menu';
 import Header from './components/header/header';
 import Footer from './components/footer/footer';
 import DesignsPage from './pages/designs/designs';
-import AboutPage from './pages/about/about';
-import ContactPage from './pages/contact/contact';
+import Page from './pages/page';
 
 function App() {
   const sidebarOpen = useSidebarState();
 
   return (
     <div className="App">
+      <Helmet>
+          <meta charSet="utf-8" />
+          <title>No Strobe</title>
+          <meta name="description" content="No Strobe - Modern Prints & Designs"/>
+          <meta name="keywords" content="design,illustration,vector,modern,art,shoegaze,strompbox,prints,minimalist,abstract,redbubble,zazzle,society6,teepublic" />
+          <link rel="canonical" href="https://nostrobe.com" />
+      </Helmet>
       <Router>
 
         {/* Sidebar Menu */}
@@ -36,12 +43,16 @@ function App() {
           <Link onClick={() => SidebarState.setState(false)} to="/designs">Designs</Link>
           <Link onClick={() => SidebarState.setState(false)} to="/about">About</Link>
           <Link onClick={() => SidebarState.setState(false)} to="/contact">Contact</Link>
-          <Link onClick={() => SidebarState.setState(false)} to="/store">Store</Link>
+          <a onClick={() => SidebarState.setState(false)} 
+             target="blank" 
+             rel="noopener noreferrer" 
+             href="https://www.redbubble.com/people/-nostrobe/shop">
+              Store
+          </a>
         </Menu>
 
+        <Header />
         <div className="contentwrapper">
-          <Header />
-
           <Switch>
             <Route path="/designs">
               <DesignsPage />
@@ -56,11 +67,11 @@ function App() {
 
 
             <Route path="/about">
-              <AboutPage />
+              <Page name="about" />
             </Route>
 
             <Route path="/contact">
-              <ContactPage />
+              <Page name="contact" />
             </Route>
 
             <Route path="/">

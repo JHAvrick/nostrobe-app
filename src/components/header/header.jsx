@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ReactComponent as Logo } from '../../assets/logo.svg';
 import { SidebarState, useSidebarState } from '../../state/sidebar-state';
 import Burger from '@animated-burgers/burger-squeeze';
@@ -35,7 +35,7 @@ function Header(props) {
         </nav>
 
         <div className="header__burger-wrapper" onClick={() => SidebarState.setState(!sidebarOpen)}>
-          <img className="hexagon" src={HexagonPNG}/>
+          <img alt="Burger Menu Backdrop" className="hexagon" src={HexagonPNG}/>
           <Burger isOpen={sidebarOpen} />
         </div>
 

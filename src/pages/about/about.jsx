@@ -1,14 +1,41 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
+import { documentToReactComponents } from '@contentful/rich-text-react-renderer';
+import client from '../../contentful-client';
+import Loader from 'react-loaders'
 import '../../styles/page.css';
 
+function useContent(){
+  const [content, setContent] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
+
+  client.getEntry({ 
+    content_type: 'page',
+    'name': 'about',
+  }).then((entry) => {
+    setFetchError(false);
+    setIsLoading(false);
+    setContent(documentToReactComponents(entry.fields.content));
+  }
+  ).catch((err) => {
+    setIsLoading(false);
+    setFetchError(true);
+  });
+
+  return [content, isLoading, fetchError];
+}
+
 function AboutPage(props) {
+  const [content, isLoading] = useContent();
 
   return (
     <section className="page">
-        <h1>About</h1>
-        <p>
-            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-        </p>
+        {
+          isLoading 
+          ? <div className="designs__loading"><Loader color="black" active={true} type="cube-transition" /></div>
+          : content
+          //: <div dangerouslySetInnerHTML={{ __html: description }}></div>
+        }
     </section>
   );
 }

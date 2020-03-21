@@ -1,9 +1,11 @@
 .header {
-    width: 100%;
+    /* width: 100%; */
     display: flex;
     justify-content: space-between;
-    padding: .75rem 1.25rem;
     align-items: center;
+    max-width: 1200px;
+    margin: auto;
+    padding: 0 1.5rem;
 }
 
 .header__logo {

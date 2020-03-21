@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Link } from "react-router-dom";
+import React from 'react';
 import './footer.css';
 
 import {FaDribbble} from 'react-icons/fa'
@@ -17,7 +16,7 @@ function Footer(props) {
                 <TiSocialInstagram size={15} /> 
                 Instagram
             </a>
-            <a href="#" target="blank" rel="noopener noreferrer" className="footer__item"> 
+            <a href="https://dribbble.com/nostrobe" target="blank" rel="noopener noreferrer" className="footer__item"> 
                 <FaDribbble size={15} /> 
                 Dribbble
             </a>
