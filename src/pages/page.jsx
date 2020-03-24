@@ -13,23 +13,17 @@ function useContent(name){
   useEffect(() => {
 
     setIsLoading(true);
-    client .getEntries({ 
+    client.getEntries({ 
         content_type: 'page',
         'fields.name': name,
     }).then((entries) => {
-
-        console.log(entries.items[0].fields.content);
-        console.log(documentToReactComponents(entries.items[0].fields.content));
-
-
         setFetchError(false);
         setIsLoading(false);
         setContent(documentToReactComponents(entries.items[0].fields.content));
-      }
-      ).catch((err) => {
-        setIsLoading(false);
-        setFetchError(true);
-      });
+    }).catch((err) => {
+      setIsLoading(false);
+      setFetchError(true);
+    });
 
   }, [name]);
 
@@ -45,7 +39,6 @@ function Page(props) {
           isLoading 
           ? <div className="designs__loading"><Loader color="black" active={true} type="cube-transition" /></div>
           : content
-          //: <div dangerouslySetInnerHTML={{ __html: description }}></div>
         }
     </section>
   );

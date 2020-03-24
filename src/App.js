@@ -54,16 +54,16 @@ function App() {
         <Header />
         <div className="contentwrapper">
           <Switch>
-            <Route path="/designs">
+            {/* <Route path="/designs">
               <DesignsPage />
-            </Route>
-
-            {/* <Route path="/designs/:category">
-              <DesignsPage />
-            </Route>
-            <Route path="/designs">
-              <Redirect to="/designs/all" />
             </Route> */}
+
+            <Route path="/designs/:category">
+              <DesignsPage />
+            </Route>
+            <Route path="/designs">
+              <Redirect to="/designs/all?page=0" />
+            </Route> 
 
 
             <Route path="/about">

@@ -6,6 +6,8 @@ import { Card, CardGrid } from '../../components/card/card';
 import { Categories, Category } from '../../components/categories/categories';
 import './designs.css';
 
+//import { useParams, useLocation } from 'react-router-dom';
+
 import {
     APIRequests,
     LoadStates,
@@ -17,6 +19,11 @@ import {
 
 
 function DesignsPage(props) {
+    // const location = useLocation();
+    // const params = useParams();
+    // console.log(params);
+    // console.log(location)
+
     useEffect(() => {
         APIRequests.initial();
         return () => APIRequests.reset()

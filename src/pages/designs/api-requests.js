@@ -119,16 +119,12 @@ const APIRequests = {
                 }
             });
 
-            console.log(nextPage);
-
             this.designs = this.designs.concat(nextPage);
             this.events.emit("pageFetched", this.designs, this.page);
             this._setLoadState(LoadStates.COMPLETE);
 
         }).catch((err) => {
-
             console.log(err);
-
             this._fetching = false;    
             this._setLoadState(LoadStates.ERROR);
         });
